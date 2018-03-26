@@ -28,7 +28,6 @@ namespace Test.Models
         public virtual DbSet<Blog> Blogs { get; set; }
         public virtual DbSet<BlogPost> BlogPosts { get; set; }
         public virtual DbSet<BlogSettings> BlogSettings1 { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<User> Users { get; set; }
     }
 }

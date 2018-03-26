@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'C:\Development\Projects\Shared\Sources\Dapper.EntityFramework.Extensions\Test\Models\TestContext.edmx'. 
+﻿// T4 code generation is enabled for model 'D:\Users\Dmitry\MyProjects\MyGitHub\Dapper.EntityFramework.Extensions\Test\Models\TestContext.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

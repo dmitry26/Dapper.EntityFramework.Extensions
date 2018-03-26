@@ -32,16 +32,6 @@
           <Property Name="AutoSave" Type="bit" Nullable="false" />
           <Property Name="AutoPost" Type="bit" Nullable="false" />
         </EntityType>
-        <EntityType Name="sysdiagrams">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="principal_id" Type="int" Nullable="false" />
-          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="version" Type="int" />
-          <Property Name="definition" Type="varbinary(max)" />
-        </EntityType>
         <EntityType Name="User">
           <Key>
             <PropertyRef Name="Id" />
@@ -91,7 +81,6 @@
           <EntitySet Name="Blog" EntityType="Self.Blog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="BlogPost" EntityType="Self.BlogPost" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="BlogSettings" EntityType="Self.BlogSettings" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_Blog_User" Association="Self.FK_Blog_User">
             <End Role="User" EntitySet="User" />
@@ -141,16 +130,6 @@
           <Property Name="AutoSave" Type="Boolean" Nullable="false" />
           <Property Name="AutoPost" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Blog" Relationship="Self.FK_BlogSettings_Blog" FromRole="BlogSettings" ToRole="Blog" />
-        </EntityType>
-        <EntityType Name="sysdiagram">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="principal_id" Type="Int32" Nullable="false" />
-          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="version" Type="Int32" />
-          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -202,7 +181,6 @@
           <EntitySet Name="Blogs" EntityType="Self.Blog" />
           <EntitySet Name="BlogPosts" EntityType="Self.BlogPost" />
           <EntitySet Name="BlogSettings1" EntityType="TestModel.BlogSettings" />
-          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
           <EntitySet Name="Users" EntityType="Self.User" />
           <AssociationSet Name="FK_Blog_User" Association="Self.FK_Blog_User">
             <End Role="User" EntitySet="Users" />
@@ -251,17 +229,6 @@
                 <ScalarProperty Name="BlogId" ColumnName="BlogId" />
                 <ScalarProperty Name="AutoSave" ColumnName="AutoSave" />
                 <ScalarProperty Name="AutoPost" ColumnName="AutoPost" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="sysdiagrams">
-            <EntityTypeMapping TypeName="TestModel.sysdiagram">
-              <MappingFragment StoreEntitySet="sysdiagrams">
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
-                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
-                <ScalarProperty Name="version" ColumnName="version" />
-                <ScalarProperty Name="definition" ColumnName="definition" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
