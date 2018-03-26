@@ -40,12 +40,12 @@ namespace Dapper
             string[] properties = entity.GetType().GetProperties().Where(o => (o.PropertyType.IsEnum || AcceptTypes.Contains(o.PropertyType.FullName) || Type.GetTypeCode(o.PropertyType) != TypeCode.Object) && o.Name != propertyKey).Select(o => o.Name).ToArray();
             string sql = string.Concat("INSERT INTO ", table, " (",
                 string.Join(", ", properties.Select(o => string.Concat("[", o, "]"))),
-                ") VALUES(",                
+                ") VALUES(",
                 string.Join(", ", properties.Select(o => "@" + o)), ");");
 
             if (returnIdentity)
                 sql += " SELECT SCOPE_IDENTITY()";
-            
+
 #if DEBUG
             LogElapsed(watch, "Parse");
 #endif
@@ -110,7 +110,7 @@ namespace Dapper
             LogElapsed(watch, "GetDbContext");
 #endif
             DynamicParameters parameter = new DynamicParameters();
-            string table = GetTableName<TEntity>(context);         
+            string table = GetTableName<TEntity>(context);
             string sql = string.Concat("DELETE FROM ", table, "");
 #if DEBUG
             LogElapsed(watch, "Parse");
@@ -144,7 +144,7 @@ namespace Dapper
             var objectQuery  = (ObjectQuery<TEntity>)((IObjectContextAdapter)context).ObjectContext.CreateObjectSet<TEntity>();
             if (where != null)
                 objectQuery = (ObjectQuery<TEntity>)objectQuery.Where(where);
-           
+
             if (orderBy != null)
             {
                 OrderBy<TEntity> order = new OrderBy<TEntity>(objectQuery);
@@ -158,7 +158,7 @@ namespace Dapper
             foreach (var param in objectQuery.Parameters)
                 parameters.Add("@" + param.Name, param.Value);
 
-            if (top != null) 
+            if (top != null)
             {
                 query = "SELECT TOP " + top.Value + query.Substring(query.IndexOf("SELECT") + 6);
             }
@@ -250,7 +250,7 @@ namespace Dapper
             LogElapsed(watch, "Database.Initialize");
 #endif
             foreach (var property in context.GetType().GetProperties().Where(o => o.PropertyType.Name == "DbSet`1"))
-            {               
+            {
                 var dbSet = property.GetValue(context);
                 dbSet.ToString();
             }
@@ -264,14 +264,14 @@ namespace Dapper
             context.Configuration.AutoDetectChangesEnabled = false;
             context.Configuration.LazyLoadingEnabled = false;
             context.Configuration.ProxyCreationEnabled = false;
-            context.Configuration.ValidateOnSaveEnabled = false;            
+            context.Configuration.ValidateOnSaveEnabled = false;
         }
         #endregion
 
         #region Methods Private
 
         private static DbContext GetDbContext(this IQueryable source)
-        {           
+        {
             var internalContextProperty = source.Provider.GetType().GetProperty("InternalContext");
             if(internalContextProperty != null)
             {
@@ -281,7 +281,7 @@ namespace Dapper
                 {
                     DbContext dbContext = (DbContext)ownerProperty.GetValue(internalContext, null);
                     if (dbContext != null)
-                        return dbContext;                    
+                        return dbContext;
                     else
                         throw new Exception("Context not found");
                 }
@@ -303,28 +303,23 @@ namespace Dapper
             return query.Substring(query.IndexOf("WHERE")).Replace("[Extent1].", "");
         }
 
-        private static string GetTableName<TEntity>(DbContext context)
-             where TEntity : class
+        private static string GetTableName<TEntity>(DbContext context) where TEntity : class
         {
-            Type type = typeof(TEntity);
-            if (!_CacheTable.ContainsKey(type))
-            {
-                var objectContext = (context as IObjectContextAdapter).ObjectContext;
-                var metadata = ((IObjectContextAdapter)context).ObjectContext.MetadataWorkspace;
-                EntitySet entitySet = metadata.GetItemCollection(DataSpace.SSpace)
-                                 .GetItems<EntityContainer>()
-                                 .Single()
-                                 .BaseEntitySets
-                                 .OfType<EntitySet>()
-                                 .FirstOrDefault(s => (!s.MetadataProperties.Contains("Type")
-                                             || s.MetadataProperties["Type"].ToString() == "Tables") && s.Name == type.Name);
+            var elemType = typeof(TEntity);
 
-                if (entitySet == null)
-                    throw new Exception(string.Format("entitySet ({0}) not found", type.Name));
-                
-                _CacheTable.Add(type, string.Format("[{0}].[{1}]", entitySet.Schema, entitySet.Name));
+            if (!_CacheTable.ContainsKey(elemType))
+            {
+                string sql = context.Set<TEntity>().ToString();
+                var regex = new System.Text.RegularExpressions.Regex("FROM (?<table>.*) AS");
+                var match = regex.Match(sql);
+
+                if (!match.Success)
+                    throw new Exception(string.Format($"{elemType.Name}: can't determine table name"));
+
+                _CacheTable.Add(elemType,match.Groups["table"].Value);
             }
-            return _CacheTable[type];
+
+            return _CacheTable[elemType];
         }
 
         private static void Init()
@@ -335,7 +330,7 @@ namespace Dapper
                 Dapper.EntityFramework.Handlers.Register();
             }
         }
-        #endregion        
+        #endregion
 
 #if DEBUG
         private static Stopwatch LogStart(string message)
@@ -369,7 +364,7 @@ namespace Dapper
         public OrderBy<TEntity> Asc<TKey>(Expression<Func<TEntity, TKey>> keySelector)
         {
             if (_Orders > 0)
-                this.Query = (ObjectQuery<TEntity>)this.Query.ThenBy(keySelector);   
+                this.Query = (ObjectQuery<TEntity>)this.Query.ThenBy(keySelector);
             else
                 this.Query = (ObjectQuery<TEntity>)this.Query.OrderBy(keySelector);
             _Orders++;
@@ -379,14 +374,14 @@ namespace Dapper
         public OrderBy<TEntity> Desc<TKey>(Expression<Func<TEntity, TKey>> keySelector)
         {
             if (_Orders > 0)
-                this.Query = (ObjectQuery<TEntity>)this.Query.ThenByDescending(keySelector);  
+                this.Query = (ObjectQuery<TEntity>)this.Query.ThenByDescending(keySelector);
             else
                 this.Query = (ObjectQuery<TEntity>)this.Query.OrderByDescending(keySelector);
             _Orders++;
             return this;
-        }  
+        }
     }
 
-    
+
     #endregion
 }
